@@ -9,7 +9,7 @@ import java.net.URI;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/{logId}/logs")
+@RequestMapping("/{userId}/logs")
 class LogRestController {
 
     private final LogRepository logRepository;
@@ -33,19 +33,23 @@ class LogRestController {
         this.validateUser(userId);
 
         return this.accountRepository.findByUsername(userId).map(account -> {
-                    Log result = logRepository.save(new Log(account, input.getUri(), input.getDescription()));
+            Log result = logRepository.save(new Log(account, input.getUri(), input.getDescription()));
 
-                    URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(result.getId()).toUri();
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(result.getId()).toUri();
 
-                    return ResponseEntity.created(location).build();
-                }).orElse(ResponseEntity.noContent().build());
+            return ResponseEntity.created(location).build();
+        }).orElse(ResponseEntity.noContent().build());
 
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{logId}")
-    Log readLog(@PathVariable String userId, @PathVariable Long logId) {
+    ResponseEntity<?> readLog(@PathVariable String userId, @PathVariable Long logId) {
         this.validateUser(userId);
-        return this.logRepository.getOne(logId);
+        if (logRepository.findById(logId).isPresent()) {
+            return ResponseEntity.ok(this.logRepository.findById(logId).get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     private void validateUser(String userId) {

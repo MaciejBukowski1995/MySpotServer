@@ -24,9 +24,9 @@ public class MyspotApplication {
 							Account account = accountRepository.save(new Account(a,
 									"password"));
 							bookmarkRepository.save(new Log(account,
-									"http://bookmark.com/1/" + a, "A description"));
+									"http://bookmark.com/0/" + a, "A description"));
 							bookmarkRepository.save(new Log(account,
-									"http://bookmark.com/2/" + a, "A description"));
+									"http://bookmark.com/1/" + a, "A description"));
 						});
 	}
 }
